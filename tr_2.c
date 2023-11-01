@@ -1,10 +1,13 @@
 /*
 Sviluppare una function C che, dato come parametro di input un array di tipo struct punto double x; double y;
-e il suo size, determina e restituisce come parametri di output gli indici dei due punti che hanno distanza minima tra loro.
+e il suo size, determina e restituisce come parametri di output gli indici dei due punti che hanno distanza minima inferiore alle altre.
 I campi x e y contengono l’ascissa e l’ordinata, rispettivamente, di un punto.
+L'algoritmo adottato per trovare la distanza minima ha una complessità temporale O(n^2)
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <limits.h>
 
 // Costruisco la struttra dei dati che andranno all'interno dell'array
 struct Points
@@ -15,17 +18,21 @@ struct Points
 
 // Dichiaro le funzioni
 struct Points *createArr(int size);
-void sortArr(struct Points arr[], int size_arr);
+struct Points *findPoints(struct Points arr[], int size_arr);
 void printArr(struct Points arr[], int nmb);
 
 int main()
 {
+    // Array di tutti punti acquisti
     struct Points *arr_points;
+    // Array con i punti con la distanza minima inferiore alle altre
+    struct Points *arr_points_with_min_dist;
     int size_arr; // Grandezza dell'array
     printf("Inserisci la dimensione dell'array: ");
-    scanf("%d", &size_arr);           // Ottengo la grandezza dell'array
-    arr_points = createArr(size_arr); // Creo l'array di punti
-    sortArr(arr_points, size_arr);    // Ordino l'array
+    scanf("%d", &size_arr);                                      // Ottengo la grandezza dell'array
+    arr_points = createArr(size_arr);                            // Creo l'array dei punti
+    arr_points_with_min_dist = findPoints(arr_points, size_arr); // Trova i punti con la distanza minima inferiore alle altre
+    printArr(arr_points_with_min_dist, 2);                       // Stampa i valori dei punti minimi ottenuti
 }
 
 // Funzione che mi consente di creare l'array di punti
@@ -43,36 +50,43 @@ struct Points *createArr(int size)
         printf("Insersci l'ascissa: ");
         scanf("%d", &points.x);
         printf("Inserisci l'ordinata: ");
-        scanf("%d", &points.x);
+        scanf("%d", &points.y);
         arr_points[i] = points;
     }
     return arr_points;
 }
 
-// Funzione per riordinare l'array
-void sortArr(struct Points arr[], int size_arr)
+// Funzione per trovare i punti con la distanza minima inferiore alle altre
+struct Points *findPoints(struct Points arr[], int size_arr)
 {
-    // Recupero il primo punto dell'array, questa variabile conterrà il punto precedente a quello attuale
-    struct Points prec = arr[0];
-    for (int i = 1; i < size_arr; i++)
+    // Array che contiene  i punti che hanno la distanza inferiore agli altri punti
+    struct Points *arr_points;
+    // Assegno una dimensione al puntatore precedentemente creato
+    arr_points = (struct Points *)malloc(size_arr * sizeof(struct Points));
+    // variabile che conterrà la distanza minima trovata
+    int distance_min = INT_MAX;
+    // Confronto ogni punto
+    for (int i = 0; i < size_arr; i++)
     {
-        if (prec.x > arr[i].x)
+        for (int idx = 0; idx < size_arr; idx++)
         {
-            // Recupero il valore del punto attuale
-            struct Points point_mom = arr[i];
-            // Sostituisco il valore del punto attuale con quello precedente
-            arr[i] = prec;
-            // Sostituisco il valore del punto precedente con quello attuale
-            arr[i - 1] = point_mom;
+            // Se i punti sono uguali passo avanti
+            if (arr[idx].x != arr[i].x && arr[idx].y != arr[i].y)
+            {
+                // calcolo la distanza
+                int distance = sqrt(pow((arr[idx].x - arr[i].x), 2) + pow((arr[idx].y - arr[i].y), 2));
+                // verifico se la nuova distanza sia minore di quella già registrata precedentemente
+                if (distance < distance_min)
+                {
+                    distance_min = distance;
+                    arr_points[0] = arr[i];
+                    arr_points[1] = arr[idx];
+                }
+            }
         }
-        prec = arr[i];
     }
-
-    printArr(arr, size_arr);
+    return arr_points;
 }
-
-
-
 
 // Funzione per visualizzare i valori all'interno dell'array
 void printArr(struct Points arr[], int nmb)
@@ -80,6 +94,6 @@ void printArr(struct Points arr[], int nmb)
     printf("La lunghezza e' %d \n", nmb);
     for (int i = 0; i < nmb; i++)
     {
-        printf("%d \n", arr[i].x);
+        printf("%d %d \n", arr[i].x, arr[i].y);
     }
 }
