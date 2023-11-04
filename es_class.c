@@ -22,7 +22,7 @@ int main()
     int nmr_colonne, nmr_righe;          // numero di colonne e di righe che avrà la matrice
     double *medie_colonne, *medie_righe; // array contenenti le medie
     double somm_qdr_el = 0;              // contiene la somma totale degli elementi alla seconda
-    // acquisisto il numero di colonne e di righe
+    // acquisisco il numero di colonne e di righe
     printf("Inserisci il numero di righe: ");
     scanf("%d", &nmr_righe);
     double **arr = (double **)malloc(nmr_righe * sizeof(double *)); // creo l'array in modo dinamico
